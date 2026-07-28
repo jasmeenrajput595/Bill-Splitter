@@ -9,7 +9,7 @@ export default function CreateGroup() {
   const [displayName, setDisplayName] = useState([]);
 
 
-  const handleClick =async ()=> {
+  function handleClick(){
     // try{
     //    const response = await axios.post("http://localhost:5173", member)
     //     console.log(response)
@@ -21,11 +21,13 @@ export default function CreateGroup() {
       }else{
         setDisplayName([...displayName, member]);
         setMember("");
-        const response = await axios.post("http://localhost:3000", member)
-        console.log(response)
+       
     }
   }
-     function handleNavigate(){
+     const handleNavigate= async()=>{
+      alert(" alerttttt")
+       const response = await axios.post("http://localhost:3000/create", member)
+        console.log(response)
         if( groupName !== "" && member !=="" ){
                 navigate("/createExpense")
             }
