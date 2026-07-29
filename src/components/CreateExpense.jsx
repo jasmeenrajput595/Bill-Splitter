@@ -1,29 +1,92 @@
 import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
+import Select from "react-select";
+import axios from 'axios'
+
 
 export default function CreateExpense(){
     const navigate = useNavigate()
+    const [ expenseName , setExpenseName]= useState("")
     const [ description , setDescription]= useState("")
+    const [ groupId , setGroupId]= useState("")
     const [ amount , setAmount]= useState("")
-    const [paidBy , setPaidBy]= useState("")
-    const [splitBetween , setSplitBetween]= useState("")
-    const[options , setOptions]= useState([])
-   
-    function handleExpense(){
-          if(description !== "" && amount !==""){
-              navigate("/expenseList")
-              return;
-        }else{
-        alert("Create Expense First")
+    const [addedBy , setAddedBy]= useState("")
+    // const[members , setMemebrs]=useState("")
+    const [selectedUser, setSelectedUser] = useState([]);
 
-        }
+
+    const userList = [
+    { value: "user1", label: "jasmeen@test.com" },
+    { value: "user2", label: "kanan@test.com" },
+    { value: "user3", label: "bruce@test.com" },
+    { value: "user4", label: "peter@test.com" },
+  ];
+   
+    const handleClick =async () => {
+      console.log(" errrorrrrr")
+ try {
+      const response = axios.post(
+        "http://localhost:3000/group/createExpense",
+        {
+          expenseName,
+          description,
+          groupId,
+          amount,
+          addedBy,
+          members: selectedUser.map((user) => user.value),
+        },
+        
+      );
+      alert(JSON.stringify(expenseName,description,groupId,addedBy))
+      console.log(JSON.stringify(response));
+      navigate("/expenseList")
+    } catch (error) {
+      console.log("something went wrong", error);
     }
+
+
+        //   if(description !== "" && amount !==""){
+        //       navigate("/expenseList")
+        //       return;
+        // }else{
+        // alert("Create Expense First")
+
+        // }
+    }
+
+    function handleChange(users) {
+    setSelectedUser(users || []);
+    console.log(users);
+    // console.log(selectedUser)
+  }
 
     return(
         <>
         <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
           <h1 className="text-3xl font-bold text-slate-900">Create Expense</h1>
+          <label className="text-sm font-medium text-slate-700">
+            GroupID :
+          </label>
+          <input
+            value={groupId}
+            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+            placeholder="GroupId"
+            onChange={(e) => setGroupId(e.target.value)}
+            required
+          />
+           <label className="text-sm font-medium text-slate-700">
+            Expense Name :
+          </label>
+
+          <input
+            value={expenseName}
+            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+            placeholder="Enter Expense Name"
+            onChange={(e) => setExpenseName(e.target.value)}
+            required
+          />
+
           <label className="text-sm font-medium text-slate-700">
             Description :
           </label>
@@ -45,33 +108,52 @@ export default function CreateExpense(){
             required
           />
           <label className="text-sm font-medium text-slate-700 mt-2">
-            Paid By :
+            Added By :
           </label>
           <input
-            value={paidBy}
+            value={addedBy}
             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
             placeholder="Who paid expense"
-            onChange={(e) => setPaidBy(e.target.value)}
+            onChange={(e) => setAddedBy(e.target.value)}
             required
           />
           <label className="text-sm font-medium text-slate-700 mt-2">
             Split Between :
           </label>
             
-           <select value={splitBetween} className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500" onChange={(e)=>setSplitBetween(e.target.value)}>
-            {options.map((item , index)=>(
-            <option key={index}>{item}</option>
-           ))}
-           </select>
+            <Select
+             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+            options={userList}
+            isMulti
+            value={selectedUser}
+            placeholder="Add Member"
+            onChange={handleChange}
+          />
+
+          <div className="mt-4">
+            <h4 className="font-medium">Currently Selected Users:</h4>
+
+            <ul className="list-disc ml-5 mt-2">
+              {selectedUser.map((item) => (
+                <li key={item.value}>
+                  {item.label} ({item.value})
+                </li>
+              ))}
+            </ul>
+           {/* <select value={splitBetween} className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500" onChange={(e)=>setSplitBetween(e.target.value)}>
+        
+           
+           </select> */}
         
           <button
-            onClick={handleExpense}
+            onClick={handleClick}
             className="mt-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
           >
             + Create Expense
           </button>
         
         </div>
+      </div>
       </div>
         </>
     )
