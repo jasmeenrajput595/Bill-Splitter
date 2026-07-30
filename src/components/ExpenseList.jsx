@@ -1,20 +1,85 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 export default function ExpenseList(){
+  const navigate = useNavigate();
+  const [groups, setGroups] = useState([]);
+const [selectedGroup, setSelectedGroup] = useState("");
+const [expenses, setExpenses] = useState([]);
+
+useEffect(() => {
+  getGroups();
+}, []);
+
+async function getGroups() {
+  try {
+    const response = await axios.get("http://localhost:3000/group/groups");
+setGroups(response.data.groups);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getExpenses() {
+   if (!selectedGroup) {
+    alert("Please Select Group");
+    return;
+  }
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/group/expenses/${selectedGroup}`
+    );
+
+setExpenses(response.data.expenses);
+  } catch (error) {
+    console.log(error);
+  }
+}
      return(
         <>
           <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
           <h1 className="text-3xl font-bold text-slate-900"> ExpenseList :</h1>
-          {/* <label className="text-sm font-medium text-slate-700">
-            GroupID :
-          </label>
-          <input
-            value={groupId}
-            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-            placeholder="GroupId"
-            onChange={(e) => setGroupId(e.target.value)}
-            required
-          /> */}
+         <select
+  value={selectedGroup}
+  onChange={(e) => setSelectedGroup(e.target.value)}
+>
+  <option>Select Group</option>
+
+  {groups.map((group) => (
+    <option key={group._id} value={group._id}>
+      {group.groupName}
+    </option>
+  ))}
+</select>
+<button onClick={getExpenses}>
+  Show Expenses
+</button>
+<button onClick={() => navigate("/balance")}>
+  View Balance
+</button>
+
+<button onClick={() => navigate("/settleUp")}>
+  Settle Up
+</button>
+{expenses.map((expense) => (
+  <div key={expense._id} className="border p-3 mt-3 rounded">
+    <h2>{expense.expenseName}</h2>
+
+    <p>{expense.description}</p>
+
+    <p>₹ {expense.amount}</p>
+
+    <p>Paid By : {expense.addedBy}</p>
+
+    <p>
+      Split Between :
+      {expense.splitBetween.join(", ")}
+    </p>
+  </div>
+))}
           </div>
           </div>
         </>

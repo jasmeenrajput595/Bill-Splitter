@@ -28,7 +28,7 @@ export default function CreateGroup() {
         "http://localhost:3000/group/createGroup",
         {
           groupName,
-          members: selectedUser.map((user) => user.value),
+          userIds: selectedUser.map((user) => user.value),
         },
         
       );
