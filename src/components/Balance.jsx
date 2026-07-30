@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import {useNavigate} from 'react-router-dom'
 
 export default function Balance() {
+  const navigate = useNavigate()
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [balance, setBalance] = useState({});
@@ -40,12 +42,22 @@ export default function Balance() {
   }
 
   return (
-    <div className="p-5">
-      <h1 className="text-3xl font-bold">
-        Balance
-      </h1>
+    <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
+      <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
+        <div className="flex justify-between items-center ">
+            <h1 className="text-3xl font-bold text-green-700">Balance :</h1>
 
+            <button
+              onClick={()=>navigate("/expenseList")}
+              className="rounded-2xl py-3 text-blue-500 font-medium hover:bg-blue-50 transition "
+            >
+              Back ←
+            </button>
+           
+          </div>
       <select
+       className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+
         value={selectedGroup}
         onChange={(e) => setSelectedGroup(e.target.value)}
       >
@@ -61,20 +73,23 @@ export default function Balance() {
         ))}
       </select>
 
-      <button onClick={getBalance}>
-        Show Balance
+      <button className="mt-2 m-2 rounded-2xl py-3 text-green-700 font-medium hover:bg-green-50 transition"
+onClick={getBalance}>
+        Show Balance 💳
       </button>
+      
 
       {Object.keys(balance).map((user) => (
         <div
           key={user}
-          className="border rounded p-3 mt-3"
+          className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
         >
-          <h3>{user}</h3>
+          <h3 className="font-bold">{user} :</h3>
 
-          <p>${balance[user]}</p>
+          <p className={`${ balance[user] > 0 ? "text-green-600" : "text-red-600"}`}>${balance[user]}</p>
         </div>
       ))}
     </div>
+      </div>
   );
 }
