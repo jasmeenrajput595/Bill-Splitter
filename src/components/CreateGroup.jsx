@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -40,11 +39,6 @@ export default function CreateGroup() {
       console.log("something went wrong", error)
     }
 
-    // if (groupName !== "" && userId !== "") {
-    //   navigate("/createExpense");
-    // } else {
-    //   alert("Fill Details");
-    // }
   };
 
   return (
@@ -110,91 +104,3 @@ export default function CreateGroup() {
   );
 }
 
-
-
-
-// import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import axios from "axios";
-// import Select from "react-select";
-
-// export default function CreateGroup() {
-//   const navigate = useNavigate();
-//   const [groupName, setGroupName] = useState("");
-//   const userList = [
-//     { value: "user1", label: "jasmeen@test.com" },
-//     { value: "user2", label: "kanan@test.com" },
-//     { value: "user3", label: "bruce@test.com" },
-//     { value: "user4", label: "peter@test.com" },
-//   ];
-//   const [selectedUser, setSelectedUser] = useState([]);
-
-//   function handleChange(users) {
-//     // 
-//     setSelectedUser([users])
-//     console.log(users)
-//     // console.log(selectedUser)
-//   }
-
-//   const handleClick = async () => {
-//     const response = await axios.post("http://localhost:3000/createGroup",groupName);
-//     navigate("/createExpense");
-//     console.log(response);
-   
-//   };
-//   return (
-//     <>
-//       <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30 ">
-//         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-//           <h1 className="text-3xl font-bold text-slate-900">Create Group</h1>
-//           <label className="text-sm font-medium text-slate-700">
-//             Group Name :
-//           </label>
-
-//           <input
-//             value={groupName}
-//             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-//             placeholder="Enter Group  Name"
-//             onChange={(e) => setGroupName(e.target.value)}
-//           />
-
-//           <label className="text-sm font-medium text-slate-700 mt-2">
-//             Select User :
-//           </label>
-//           <Select
-//             options={userList}
-//             multiple={true}
-//             value={selectedUser}
-//             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-//             placeholder="Add Member"
-//             onChange={handleChange}
-//           >
-//             <div style={{ marginTop: "20px" }}>
-//               <h4>Currently Selected IDs:</h4>
-//               <ul>
-//                 {userList.map((item) => (
-//                   <li key={item.value}>
-//                     {item.label} ({item.value})
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-//           </Select>
-
-//           {/* <button
-//             onClick={handleClick}
-//             className="mt-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
-//           >
-//             + Add
-//           </button>  */}
-//           <button
-//             onClick={handleClick}
-//             className="mt-2 m-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
-//           >
-//              +Create
-//           </button>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
