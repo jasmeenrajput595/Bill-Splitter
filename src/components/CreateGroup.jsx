@@ -8,10 +8,10 @@ export default function CreateGroup() {
   const [groupName, setGroupName] = useState("");
 
   const userList = [
-    { value: "user1", label: "jasmeen@test.com" },
-    { value: "user2", label: "kanan@test.com" },
-    { value: "user3", label: "bruce@test.com" },
-    { value: "user4", label: "peter@test.com" },
+    { value: "Jasmeen", label: "jasmeen@test.com" },
+    { value: "Kanan", label: "kanan@test.com" },
+    { value: "Bruce", label: "bruce@test.com" },
+    { value: "Peter", label: "peter@test.com" },
   ];
 
   const [selectedUser, setSelectedUser] = useState([]);
@@ -32,6 +32,8 @@ export default function CreateGroup() {
         },
         
       );
+        localStorage.setItem("login", "true");
+
       alert(JSON.stringify(groupName))
       console.log(JSON.stringify(response));
       navigate("/createExpense")
@@ -46,7 +48,7 @@ export default function CreateGroup() {
       <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
           <h1 className="text-3xl font-bold text-slate-900">
-            Create Group
+            Create Group :
           </h1>
 
           <label className="text-sm font-medium text-slate-700">

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function SettleUp() {
+  const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
-  const [result, setResult] = useState([]);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     fetchGroups();
@@ -13,6 +15,7 @@ export default function SettleUp() {
   async function fetchGroups() {
     try {
       const response = await axios.get("http://localhost:3000/group/groups");
+      console.log(response.data);
       setGroups(response.data.groups);
     } catch (error) {
       console.log(error);
@@ -27,10 +30,10 @@ export default function SettleUp() {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/group/settleup/${selectedGroup}`
+        `http://localhost:3000/group/settleup/${selectedGroup}`,
       );
 
-      setResult(response.data.result);
+      setTransactions(response.data.transactions);
     } catch (error) {
       console.log(error);
     }
@@ -38,16 +41,28 @@ export default function SettleUp() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center pt-10">
-      <div className="w-full max-w-xl bg-white p-6 rounded-xl shadow">
+      <div className="w-full max-w-xl bg-white p-6 rounded-xl shadow ">
+        <div className="flex justify-between items-center ">
+          <h1 className="text-3xl font-bold text-yellow-700">Settle Up :</h1>
 
-        <h1 className="text-3xl font-bold mb-5">
-          Settle Up
-        </h1>
+          <button
+            onClick={fetchSettleUp}
+            className="mt-2 m-2 rounded-xl p-2 text-yellow-500 font-medium hover:bg-yellow-50 transition translate-x-25"
+          >
+            Show Result
+          </button>
 
+          <button
+            onClick={() => navigate("/expenseList")}
+            className="rounded-2xl py-3 text-yellow-500 font-medium hover:bg-yellow-50 transition "
+          >
+            Back ←
+          </button>
+        </div>
         <select
           value={selectedGroup}
           onChange={(e) => setSelectedGroup(e.target.value)}
-          className="border rounded p-2 w-full"
+          className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
         >
           <option value="">Select Group</option>
 
@@ -58,26 +73,18 @@ export default function SettleUp() {
           ))}
         </select>
 
-        <button
-          onClick={fetchSettleUp}
-          className="bg-violet-600 text-white px-4 py-2 rounded mt-4"
-        >
-          Show Result
-        </button>
-
-        {result.map((item, index) => (
+        {transactions.map((item, index) => (
           <div
             key={index}
-            className="border rounded p-3 mt-4"
+            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
           >
-            <h2 className="font-semibold">{item.user}</h2>
+            <p>
+              <strong>{item.from}</strong> pays to <strong>{item.to}</strong>
+            </p>
 
-            <p>Status : {item.status}</p>
-
-            <p>Amount : ${item.amount}</p>
+            <p>Amount : ₹{item.amount}</p>
           </div>
         ))}
-
       </div>
     </div>
   );

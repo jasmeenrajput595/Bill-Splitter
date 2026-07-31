@@ -83,8 +83,10 @@ return;
     <>
       <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-          <h1 className="text-3xl font-bold text-slate-900">Create Expense</h1>
+          <h1 className="text-3xl font-bold text-blue-900">Create Expense :</h1>
+
           <select
+           className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
             value={selectedGroup?._id || ""}
             onChange={(e) => {
               const group = groups.find((group) => group._id === e.target.value);
@@ -92,7 +94,7 @@ return;
               setSelectedGroup(group);
             }}
           >
-            <option>Select Group</option>
+            <option >Select Group</option>
 
             {groups.map((group) => (
               <option key={group._id} value={group._id}>
@@ -135,7 +137,9 @@ return;
           <label className="text-sm font-medium text-slate-700 mt-2">
             Paid By :
           </label>
-          <select value={addedBy} onChange={(e) => setAddedBy(e.target.value)}>
+          <select 
+                      className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+value={addedBy} onChange={(e) => setAddedBy(e.target.value)}>
             <option>Select Payer</option>
             {
               selectedGroup?.userIds.map((user) => (
@@ -150,6 +154,8 @@ return;
           </label>
 
           <Select
+                      className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+
             options=
             {
               selectedGroup? selectedGroup.userIds.map((user) => ({
@@ -162,7 +168,7 @@ return;
 
           <button
             onClick={handleClick}
-            className="mt-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
+            className="mt-2 rounded-2xl py-3 text-blue-700 font-medium hover:bg-violet-50 transition"
           >
             + Create Expense
           </button>
