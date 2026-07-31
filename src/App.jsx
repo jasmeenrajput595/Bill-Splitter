@@ -6,16 +6,18 @@ import Balance from "./components/Balance";
 import SettleUp from "./components/SettleUp";
 import {Routes, Route } from "react-router-dom";
 import PrivateRoute from './PrivateRoutes/PrivateRoute'
+import LoginPage from './components/LoginPage'
 
 export default function App() {
+ 
   return (
     <>
       <Routes>
       {/* <Navbar/> */}
-        <Route path="/" element={<CreateGroup />} />
 
+        <Route path="/" element={<LoginPage />} />
         <Route element={<PrivateRoute />}>
-        {/* <Route path="/expenseList" element={<Navbar />} /> */}
+        <Route path="/createGroup" element={<CreateGroup />} />
           <Route path="/createExpense" element={<CreateExpense />} />
           <Route path="/expenseList" element={<ExpenseList />} />
           <Route path="/balance" element={<Balance />} />

@@ -32,7 +32,7 @@ export default function CreateGroup() {
         },
         
       );
-        localStorage.setItem("login", "true");
+        // localStorage.setItem("login", "true");
 
       alert(JSON.stringify(groupName))
       console.log(JSON.stringify(response));
