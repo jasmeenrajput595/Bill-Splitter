@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+import Navbar from './Navbar'
+
 
 export default function SettleUp() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
   }, []);
 
   async function fetchGroups() {
     try {
       const response = await axios.get("http://localhost:3000/group/groups");
-      console.log(response.data);
+      // console.log(response.data);
       setGroups(response.data.groups);
     } catch (error) {
       console.log(error);
@@ -40,7 +43,9 @@ export default function SettleUp() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex justify-center pt-10">
+    <>
+     <Navbar/>
+    <div className="h-143 bg-slate-100 flex justify-center pt-10">
       <div className="w-full max-w-xl bg-white p-6 rounded-xl shadow ">
         <div className="flex justify-between items-center ">
           <h1 className="text-3xl font-bold text-yellow-700">Settle Up :</h1>
@@ -52,13 +57,14 @@ export default function SettleUp() {
             Show Result
           </button>
 
-          <button
+          {/* <button
             onClick={() => navigate("/expenseList")}
             className="rounded-2xl py-3 text-yellow-500 font-medium hover:bg-yellow-50 transition "
           >
             Back ←
-          </button>
+          </button> */}
         </div>
+      
         <select
           value={selectedGroup}
           onChange={(e) => setSelectedGroup(e.target.value)}
@@ -87,5 +93,6 @@ export default function SettleUp() {
         ))}
       </div>
     </div>
+    </>
   );
 }

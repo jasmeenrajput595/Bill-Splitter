@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {useNavigate} from 'react-router-dom'
+// import {useNavigate} from 'react-router-dom'
+import Navbar from './Navbar'
 
 export default function Balance() {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [balance, setBalance] = useState({});
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     getGroups();
   }, []);
 
@@ -34,6 +36,7 @@ export default function Balance() {
       const response = await axios.get(
         `http://localhost:3000/group/balance/${selectedGroup}`
       );
+      console.log(response.data.balance);
 
       setBalance(response.data.balance);
     } catch (error) {
@@ -42,17 +45,19 @@ export default function Balance() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
-      <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
+    <>
+    <Navbar/>
+    <div className="h-143 pt-10 bg-slate-100 flex justify-center items-start">
+      <div className=" max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
         <div className="flex justify-between items-center ">
             <h1 className="text-3xl font-bold text-green-700">Balance :</h1>
 
-            <button
+            {/* <button
               onClick={()=>navigate("/expenseList")}
               className="rounded-2xl py-3 text-blue-500 font-medium hover:bg-blue-50 transition "
             >
               Back ←
-            </button>
+            </button> */}
            
           </div>
       <select
@@ -91,5 +96,6 @@ onClick={getBalance}>
       ))}
     </div>
       </div>
+    </>
   );
 }

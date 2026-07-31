@@ -14,6 +14,7 @@ export default function CreateExpense() {
   const [selectedUser, setSelectedUser] = useState([]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
   }, []);
 
@@ -31,7 +32,7 @@ export default function CreateExpense() {
   }
 
   const handleClick = async () => {
-    console.log(" errrorrrrr");
+    // console.log(" errrorrrrr");
     if (!selectedGroup) {
       alert("Please Select a group");
      return;
