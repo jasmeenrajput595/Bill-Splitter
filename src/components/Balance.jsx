@@ -6,13 +6,38 @@ export default function Balance() {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [balance, setBalance] = useState({});
+  const [users, setUsers] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
-    getGroups();
+    fetchUsers();
+        // eslint-disable-next-line react-hooks/immutability
+        getGroups();
+
   }, []);
 
+  async function fetchUsers() {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/billSplitter/users",
+      );
+
+      setUsers(response.data.users);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function getUserName(id) {
+  const foundUser = users.find(
+    (u) => String(u._id) === String(id)
+  );
+
+  return foundUser ? foundUser.name : id;
+}
+ 
+ 
   async function getGroups() {
     try {
       const response = await axios.get(
@@ -83,16 +108,26 @@ onClick={getBalance}>
       </button>
       
 
-      {Object.keys(balance).map((user) => (
-        <div
-          key={user}
-          className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-        >
-          <h3 className="font-bold">{user} :</h3>
+     {Object.keys(balance).map((userId) => (
+  <div
+    key={userId}
+    className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3"
+  >
+    <h3 className="font-bold">
+      {getUserName(userId)} :
+    </h3>
 
-          <p className={`${ balance[user] > 0 ? "text-green-600" : "text-red-600"}`}>${balance[user]}</p>
-        </div>
-      ))}
+    <p
+      className={
+        balance[userId] > 0
+          ? "text-green-600"
+          : "text-red-600"
+      }
+    >
+      ${balance[userId]}
+    </p>
+  </div>
+))}
     </div>
       </div>
     </>

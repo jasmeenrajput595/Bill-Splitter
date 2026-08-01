@@ -13,53 +13,56 @@ export default function CreateExpense() {
   const [users, setUsers] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedUser, setSelectedUser] = useState([]);
-
+  
   const user = JSON.parse(localStorage.getItem("user"));
   // console.log("login user:", user)
   // console.log("login id:", user._id)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
+    // eslint-disable-next-line react-hooks/immutability
     fetchUsers();
   }, []);
   
   async function fetchGroups() {
     try {
-      console.log("frontend users:", user)
-      console.log("user id:", user._id)
+      // console.log("frontend users:", user)
+      // console.log("user id:", user._id)
       const response = await axios.get(
         `http://localhost:3000/billSplitter/groups/${user._id}`,
       );
       console.log(response.data)
       setGroups(response.data.groups);
       // console.log(response.data.groups);
-
+      
     } catch (error) {
       console.log(error);
     }
   }
   async function fetchUsers() {
+    console.log("fetch users called")
     try {
       // console.log("frontend users:", user)
       // console.log("user id:", user._id)
       const response = await axios.get(
-        'http://localhost:3000/billSplitter/groups/users',
+        'http://localhost:3000/billSplitter/users',
       );
-      console.log(response.data)
-      setUsers(response.data.groups);
-      // console.log(response.data.groups);
+     console.log("All Users From API:", response.data.users);
 
+      setUsers(response.data.users);
+      // console.log(response.data.groups);
+      
     } catch (error) {
       console.log(error);
     }
   }
-
+  
   const handleClick = async () => {
     if (!selectedGroup) {
       alert("Please Select a group");
       return;
     }
-
+    
     if (selectedUser.length === 0) {
       alert("Please select members");
       return;
@@ -102,6 +105,8 @@ export default function CreateExpense() {
               const group = groups.find(
                 (group) => group._id === e.target.value,
               );
+             console.log("Selected Group:", group);
+  console.log("Selected User IDs:", group?.userIds);
 
               setSelectedGroup(group);
             }}
@@ -153,24 +158,30 @@ export default function CreateExpense() {
           <label className="text-sm font-medium text-slate-700 mt-2">
             Split Between :
           </label>
+              
+        <Select
+  className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3 focus:border-violet-500"
+  options={
+    selectedGroup
+      ? selectedGroup.userIds.map((id) => {
+          const foundUser = users.find(
+            (u) => String(u._id) === String(id)
+          );
 
-          <Select
-            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-            options={
-              selectedGroup
-                ? selectedGroup.userIds.map((id) => {
-                  const user = users.find((u)=>
-                    u._id === id);
-                  return {
-                  value: id,
-                  label: user ? user
-                })
-                : []
-            }
-            isMulti
-            value={selectedUser}
-            onChange={handleChange}
-          />
+          console.log("ID:", id);
+          console.log("Found User:", foundUser);
+
+          return {
+            value: id,
+            label: foundUser ? foundUser.name : "Unknown User",
+          };
+        })
+      : []
+  }
+  isMulti
+  value={selectedUser}
+  onChange={handleChange}
+/>
 
           <button
             onClick={handleClick}

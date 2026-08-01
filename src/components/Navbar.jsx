@@ -17,24 +17,25 @@ export default function ExpenseList() {
           <h1 className=" m-2 text-3xl font-bold text-slate-900">Bill-Splitter :</h1>
             <div className="space-x-6">
                  <button
-            className=" rounded-2xl py-3 font-medium hover:bg-indigo-50 transition"
+            className=" m-2 rounded-2xl py-3 font-medium hover:bg-indigo-50 transition"
             onClick={() => navigate("/createExpense")}
           >
             Create Expense💵
           </button>
           
-          <button
-            className=" m-2 rounded-2xl py-3  font-medium hover:bg-indigo-50 transition"
-            onClick={() => navigate("/balance")}
-          >
-            View Balance💳
-          </button>
 
           <button
             className=" m-2 rounded-2xl py-3  font-medium hover:bg-indigo-50 transition"
             onClick={() => navigate("/expenseList")}
           >
             Expense List💸
+          </button>
+
+          <button
+            className=" m-2 rounded-2xl py-3  font-medium hover:bg-indigo-50 transition"
+            onClick={() => navigate("/balance")}
+          >
+            View Balance💳
           </button>
 
           <button
