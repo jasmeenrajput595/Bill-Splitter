@@ -21,6 +21,7 @@ export default function CreateGroup() {
   const [selectedUser, setSelectedUser] = useState([]);
 
   useEffect(() => {
+  // eslint-disable-next-line react-hooks/immutability
   fetchUsers();
 }, []);
 
@@ -70,12 +71,15 @@ setUserList(users);
 
   return (
     <>
-      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
+      <div className="min-h-screen bg-slate-100 flex flex-col items-center pt-8">
+              <h1  className="text-3xl font-bold text-blue-800 mb-5">Welcome {user.name}!</h1>
+
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-              <h1 className="text-3xl font-bold text-slate-900">Welcome {user.name}</h1>
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-xl flex justify-center font-bold    text-slate-900 mb-6">
             Create Group :
           </h1>
+           
+           <div className="mb-4">
 
           <label className="text-sm font-medium text-slate-700">
             Group Name :
@@ -86,7 +90,9 @@ setUserList(users);
             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3 focus:border-violet-500"
             placeholder="Enter Group Name"
             onChange={(e) => setGroupName(e.target.value)}
-          />
+            />
+            </div>
+            <div>
 
           <label className="text-sm font-medium text-slate-700 mt-2">
             Select User :
@@ -99,9 +105,10 @@ setUserList(users);
             value={selectedUser}
             placeholder="Add Member"
             onChange={handleChange}
-          />
+            />
+            </div>
 
-          <div className="mt-4">
+          {/* <div className="mt-6">
             <h4 className="font-medium">Currently Selected Users:</h4>
 
             <ul className="list-disc ml-5 mt-2">
@@ -111,11 +118,11 @@ setUserList(users);
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           <button
             onClick={handleClick}
-            className="mt-2 m-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
+            className="mt-2 m-2 rounded-2xl py-3  text-indigo-600 font-medium hover:bg-violet-50 transition"
           >
             +Create Group
           </button>

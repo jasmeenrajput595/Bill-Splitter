@@ -10,25 +10,45 @@ export default function CreateExpense() {
   const [amount, setAmount] = useState("");
   // const [addedBy, setAddedBy] = useState("");
   const [groups, setGroups] = useState([]);
+  const [users, setUsers] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedUser, setSelectedUser] = useState([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
-
+  // console.log("login user:", user)
+  // console.log("login id:", user._id)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
+    fetchUsers();
   }, []);
-
+  
   async function fetchGroups() {
     try {
+      console.log("frontend users:", user)
+      console.log("user id:", user._id)
       const response = await axios.get(
         `http://localhost:3000/billSplitter/groups/${user._id}`,
       );
-      console.log(response.data);
-
+      console.log(response.data)
       setGroups(response.data.groups);
-      console.log(Array.isArray(response.data.groups));
+      // console.log(response.data.groups);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async function fetchUsers() {
+    try {
+      // console.log("frontend users:", user)
+      // console.log("user id:", user._id)
+      const response = await axios.get(
+        'http://localhost:3000/billSplitter/groups/users',
+      );
+      console.log(response.data)
+      setUsers(response.data.groups);
+      // console.log(response.data.groups);
+
     } catch (error) {
       console.log(error);
     }
@@ -68,7 +88,7 @@ export default function CreateExpense() {
     setSelectedUser(users || []);
     console.log(users);
   }
-
+//  console.log("state groups:", groups)
   return (
     <>
       <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
@@ -126,9 +146,9 @@ export default function CreateExpense() {
             onChange={(e) => setAmount(e.target.value)}
             required
           />
-          <label className="text-sm font-medium text-slate-700 mt-2">
-            Paid By :<b>{user.name}</b>
-          </label>
+            <label className="text-sm font-medium text-slate-700 mt-2">
+              Paid By :<div  className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"><b>{user.name}</b></div>
+            </label>
 
           <label className="text-sm font-medium text-slate-700 mt-2">
             Split Between :
@@ -138,10 +158,13 @@ export default function CreateExpense() {
             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
             options={
               selectedGroup
-                ? selectedGroup.userIds.map((user) => ({
-                    value: user,
-                    label: user,
-                  }))
+                ? selectedGroup.userIds.map((id) => {
+                  const user = users.find((u)=>
+                    u._id === id);
+                  return {
+                  value: id,
+                  label: user ? user
+                })
                 : []
             }
             isMulti

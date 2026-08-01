@@ -1,6 +1,9 @@
 import {useState} from "react";
+import axios from 'axios'
+import {useNavigate} from 'react-router-dom'
 
 export default function Login() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,10 +39,10 @@ console.log(response.data);
     <>
       <form>
         <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
-          <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-            <h1 className="text-3xl font-bold text-slate-900">Login :</h1>
+          <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8 ">
+            <h1  className="text-3xl flex justify-center font-bold text-indigo-800 mb-6">Login </h1>
 
-            <label className="text-sm font-medium text-slate-700">
+            <label className="text-sm font-medium text-slate-700 ">
               Email :
             </label>
 
@@ -65,9 +68,9 @@ console.log(response.data);
 
             <button
               onClick={handleRegister}
-              className="mt-2 m-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
+              className="mt-2 m-2 rounded-2xl py-3  text-indigo-600  font-medium hover:bg-violet-50 transition"
             >
-              Register
+              Login →
             </button>
           </div>
         </div>
