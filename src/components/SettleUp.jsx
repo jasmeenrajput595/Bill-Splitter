@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-// import { useNavigate } from "react-router-dom";
 import Navbar from './Navbar'
 
 
 export default function SettleUp() {
-  // const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [transactions, setTransactions] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -17,8 +16,7 @@ export default function SettleUp() {
 
   async function fetchGroups() {
     try {
-      const response = await axios.get("http://localhost:3000/group/groups");
-      // console.log(response.data);
+      const response = await axios.get(  `http://localhost:3000/billSplitter/groups/${user._id}`);
       setGroups(response.data.groups);
     } catch (error) {
       console.log(error);
@@ -33,7 +31,7 @@ export default function SettleUp() {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/group/settleup/${selectedGroup}`,
+        `http://localhost:3000/billSplitter/settleup/${selectedGroup}`,
       );
 
       setTransactions(response.data.transactions);
@@ -57,12 +55,7 @@ export default function SettleUp() {
             Show Result
           </button>
 
-          {/* <button
-            onClick={() => navigate("/expenseList")}
-            className="rounded-2xl py-3 text-yellow-500 font-medium hover:bg-yellow-50 transition "
-          >
-            Back ←
-          </button> */}
+          
         </div>
       
         <select

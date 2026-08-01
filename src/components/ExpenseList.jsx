@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from './Navbar'
 
-// import { useNavigate } from "react-router-dom";
 
 export default function ExpenseList(){
-    // const navigate = useNavigate();
      const [groups, setGroups] = useState([]);
       const [selectedGroup, setSelectedGroup] = useState("");
       const [expenses, setExpenses] = useState([]);
-
+      const user = JSON.parse(localStorage.getItem("user"));
+      
 useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
     getGroups();
@@ -17,7 +16,7 @@ useEffect(() => {
 
   async function getGroups() {
     try {
-      const response = await axios.get("http://localhost:3000/group/groups");
+      const response = await axios.get(`http://localhost:3000/billSplitter/groups/${user._id}`);
       setGroups(response.data.groups);
     } catch (error) {
       console.log(error);
@@ -32,7 +31,7 @@ useEffect(() => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:3000/group/expenses/${selectedGroup}`,
+        `http://localhost:3000/billSplitter/expenses/${selectedGroup}`,
       );
 
       setExpenses(response.data.expenses);
@@ -85,7 +84,7 @@ useEffect(() => {
               </p>
 
               <p>
-                <b>Paid By :</b> {expense.addedBy}
+                <b>Paid By :</b> {expense.addedBy.name}
               </p>
 
               <p>

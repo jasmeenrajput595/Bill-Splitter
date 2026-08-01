@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-// import {useNavigate} from 'react-router-dom'
 import Navbar from './Navbar'
 
 export default function Balance() {
-  // const navigate = useNavigate()
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [balance, setBalance] = useState({});
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -17,7 +16,7 @@ export default function Balance() {
   async function getGroups() {
     try {
       const response = await axios.get(
-        "http://localhost:3000/group/groups"
+        `http://localhost:3000/billSplitter/groups/${user._id}`
       );
 
       setGroups(response.data.groups);
@@ -34,7 +33,7 @@ export default function Balance() {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/group/balance/${selectedGroup}`
+        `http://localhost:3000/billSplitter/balance/${selectedGroup}`
       );
       console.log(response.data.balance);
 

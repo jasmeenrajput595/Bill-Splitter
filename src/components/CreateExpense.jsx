@@ -8,10 +8,12 @@ export default function CreateExpense() {
   const [expenseName, setExpenseName] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [addedBy, setAddedBy] = useState("");
+  // const [addedBy, setAddedBy] = useState("");
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedUser, setSelectedUser] = useState([]);
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -20,10 +22,11 @@ export default function CreateExpense() {
 
   async function fetchGroups() {
     try {
-      const response = await axios.get("http://localhost:3000/group/groups");
+      const response = await axios.get(
+        `http://localhost:3000/billSplitter/groups/${user._id}`,
+      );
       console.log(response.data);
 
-      // setGroups(response.data);
       setGroups(response.data.groups);
       console.log(Array.isArray(response.data.groups));
     } catch (error) {
@@ -32,52 +35,38 @@ export default function CreateExpense() {
   }
 
   const handleClick = async () => {
-    // console.log(" errrorrrrr");
     if (!selectedGroup) {
       alert("Please Select a group");
-     return;
-}
+      return;
+    }
 
-if (!addedBy) {
-  alert("Please select who paid the expense");
-  return;
-}
-
-if (selectedUser.length === 0) {
-alert("Please select members");
-return;
-}
+    if (selectedUser.length === 0) {
+      alert("Please select members");
+      return;
+    }
     try {
-
-      const response = await axios.post("http://localhost:3000/group/createExpense", {
-        expenseName,
-        description,
-        groupId: selectedGroup._id,
-        amount,
-        addedBy,
-        splitBetween: selectedUser.map((user) => user.value),
-      });
-      // alert(JSON.stringify(expenseName, description, groupId, addedBy));
+      const response = await axios.post(
+        "http://localhost:3000/billSplitter/createExpense",
+        {
+          expenseName,
+          description,
+          groupId: selectedGroup._id,
+          amount,
+          addedBy: user._id,
+          splitBetween: selectedUser.map((user) => user.value),
+        },
+      );
       console.log(response.data);
       alert("Expense Created Successfully");
       navigate("/expenseList");
     } catch (error) {
       console.log("something went wrong", error);
     }
-
-    //   if(description !== "" && amount !==""){
-    //       navigate("/expenseList")
-    //       return;
-    // }else{
-    // alert("Create Expense First")
-
-    // }
   };
 
   function handleChange(users) {
     setSelectedUser(users || []);
     console.log(users);
-    // console.log(selectedUser)
   }
 
   return (
@@ -87,15 +76,17 @@ return;
           <h1 className="text-3xl font-bold text-blue-900">Create Expense :</h1>
 
           <select
-           className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
             value={selectedGroup?._id || ""}
             onChange={(e) => {
-              const group = groups.find((group) => group._id === e.target.value);
+              const group = groups.find(
+                (group) => group._id === e.target.value,
+              );
 
               setSelectedGroup(group);
             }}
           >
-            <option >Select Group</option>
+            <option>Select Group</option>
 
             {groups.map((group) => (
               <option key={group._id} value={group._id}>
@@ -136,36 +127,27 @@ return;
             required
           />
           <label className="text-sm font-medium text-slate-700 mt-2">
-            Paid By :
+            Paid By :<b>{user.name}</b>
           </label>
-          <select 
-                      className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-value={addedBy} onChange={(e) => setAddedBy(e.target.value)}>
-            <option>Select Payer</option>
-            {
-              selectedGroup?.userIds.map((user) => (
-                <option key={user} value={user}>
-                  {user}
-                </option>
-              ))
-            }
-          </select>
+
           <label className="text-sm font-medium text-slate-700 mt-2">
             Split Between :
           </label>
 
           <Select
-                      className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-
-            options=
-            {
-              selectedGroup? selectedGroup.userIds.map((user) => ({
-                  value: user, label: user
-                })) : []
+            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+            options={
+              selectedGroup
+                ? selectedGroup.userIds.map((user) => ({
+                    value: user,
+                    label: user,
+                  }))
+                : []
             }
             isMulti
             value={selectedUser}
-            onChange={handleChange}/>
+            onChange={handleChange}
+          />
 
           <button
             onClick={handleClick}

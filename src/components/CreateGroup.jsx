@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Select from "react-select";
@@ -7,14 +7,38 @@ export default function CreateGroup() {
   const navigate = useNavigate();
   const [groupName, setGroupName] = useState("");
 
-  const userList = [
-    { value: "Jasmeen", label: "jasmeen@test.com" },
-    { value: "Kanan", label: "kanan@test.com" },
-    { value: "Bruce", label: "bruce@test.com" },
-    { value: "Peter", label: "peter@test.com" },
-  ];
+   const user = JSON.parse(localStorage.getItem("user"));
 
+  console.log(user);
+
+  // const userList = [
+  //   { value: "Jasmeen", label: "jasmeen@test.com" },
+  //   { value: "Kanan", label: "kanan@test.com" },
+  //   { value: "Bruce", label: "bruce@test.com" },
+  //   { value: "Peter", label: "peter@test.com" },
+  // ];
+  const [userList, setUserList] = useState([]);
   const [selectedUser, setSelectedUser] = useState([]);
+
+  useEffect(() => {
+  fetchUsers();
+}, []);
+
+async function fetchUsers() {
+  try {
+    const response = await axios.get("http://localhost:3000/billSplitter/users");
+
+    const users = response.data.users.filter((item) => item._id !== user._id) .map((item) => ({
+    value: item._id,
+    label: item.name,
+  }));
+
+setUserList(users);
+
+  } catch (error) {
+    console.log(error);
+  }
+}
 
   function handleChange(users) {
     setSelectedUser(users || []);
@@ -25,16 +49,17 @@ export default function CreateGroup() {
   const handleClick = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/group/createGroup",
+        "http://localhost:3000/billSplitter/createGroup",
         {
           groupName,
-          userIds: selectedUser.map((user) => user.value),
+         userIds: [ user._id,...selectedUser.map((item) => item.value),
+],
         },
         
       );
         // localStorage.setItem("login", "true");
 
-      alert(JSON.stringify(groupName))
+      alert("Group Created successfully")
       console.log(JSON.stringify(response));
       navigate("/createExpense")
     } catch (error) {
@@ -47,6 +72,7 @@ export default function CreateGroup() {
     <>
       <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
+              <h1 className="text-3xl font-bold text-slate-900">Welcome {user.name}</h1>
           <h1 className="text-3xl font-bold text-slate-900">
             Create Group :
           </h1>
@@ -86,13 +112,6 @@ export default function CreateGroup() {
               ))}
             </ul>
           </div>
-
-          {/* <button
-            onClick={handleClick}
-            className="mt-2 rounded-2xl py-3 text-violet-700 font-medium hover:bg-violet-50 transition"
-          >
-            + Add
-          </button> */}
 
           <button
             onClick={handleClick}
