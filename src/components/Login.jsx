@@ -1,80 +1,138 @@
-import {useState} from "react";
-import axios from 'axios'
-import {useNavigate} from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import api from "../api/api";
+import { loginSchema } from "../validation/authValidation";
 
 export default function Login() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = async (e) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/billSplitter/login",
+      setErrors({});
+
+      await loginSchema.validate(
         {
           email,
           password,
         },
+        {
+          abortEarly: false,
+        }
       );
-console.log(response);
-console.log(response.data);
 
-      localStorage.setItem("login", "true");
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      setLoading(true);
+
+      const { data } = await api.post("/login", {
+        email,
+        password,
+      });
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      toast.success(data.message);
 
       navigate("/createGroup");
     } catch (error) {
-        console.log(error.response);
+      if (error.inner) {
+        const validationErrors = {};
 
-  if (error.response) {
-    alert(error.response.data.message);
-  } else {
-    alert("Backend not reachable");
-  }
+        error.inner.forEach((err) => {
+          validationErrors[err.path] = err.message;
+        });
+
+        setErrors(validationErrors);
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <>
-      <form>
-        <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
-          <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8 ">
-            <h1  className="text-3xl flex justify-center font-bold text-indigo-800 mb-6">Login </h1>
+    <form onSubmit={handleLogin}>
+      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
+        <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
 
-            <label className="text-sm font-medium text-slate-700 ">
-              Email :
-            </label>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-indigo-900">
+              Login
+            </h1>
+
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="text-indigo-700 hover:text-indigo-900"
+            >
+              ← Register
+            </button>
+          </div>
+
+          <label>Email</label>
+
+          <input
+            type="email"
+            placeholder="Enter Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3"
+          />
+
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.email}
+            </p>
+          )}
+
+          <label className="block mt-4">Password</label>
+
+          <div className="relative">
 
             <input
-              type="text"
-              value={email}
-              className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3 focus:border-violet-500"
-              placeholder="Enter email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-
-            <label className="text-sm font-medium text-slate-700">
-              Password :
-            </label>
-
-            <input
-              type="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter Password"
               value={password}
-              className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3 focus:border-violet-500"
-              placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3 pr-16"
             />
 
             <button
-              onClick={handleRegister}
-              className="mt-2 m-2 rounded-2xl py-3  text-indigo-600  font-medium hover:bg-violet-50 transition"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-5 text-sm text-indigo-600"
             >
-              Login →
+              {showPassword ? "Hide" : "Show"}
             </button>
+
           </div>
+
+          {errors.password && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-6 bg-indigo-600 text-white rounded-xl py-3 hover:bg-indigo-700 disabled:bg-gray-400"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+
         </div>
-      </form>
-    </>
+      </div>
+    </form>
   );
 }
