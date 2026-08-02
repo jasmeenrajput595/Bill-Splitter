@@ -1,134 +1,149 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import Navbar from './Navbar'
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
+import Navbar from "./Navbar";
+import api from "../api/api";
+import { getToken, getUser } from "../utils/auth";
 
 export default function Balance() {
+  const token = getToken();
+  const user = getUser();
+
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
-  const [balance, setBalance] = useState({});
-  const [users, setUsers] = useState([]);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
-    fetchUsers();
-        // eslint-disable-next-line react-hooks/immutability
-        getGroups();
-
+    fetchGroups();
   }, []);
 
-  async function fetchUsers() {
+  const fetchGroups = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/billSplitter/users",
-      );
+      const { data } = await api.get("/groups", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      setUsers(response.data.users);
+      setGroups(data.groups);
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to fetch groups");
     }
-  }
+  };
 
-  function getUserName(id) {
-  const foundUser = users.find(
-    (u) => String(u._id) === String(id)
-  );
-
-  return foundUser ? foundUser.name : id;
-}
- 
- 
-  async function getGroups() {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/billSplitter/groups/${user._id}`
-      );
-
-      setGroups(response.data.groups);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function getBalance() {
+  const fetchBalance = async () => {
     if (!selectedGroup) {
-      alert("Select Group");
-      return;
+      return toast.error("Please select a group");
     }
 
     try {
-      const response = await axios.get(
-        `http://localhost:3000/billSplitter/balance/${selectedGroup}`
-      );
-      console.log(response.data.balance);
+      setLoading(true);
 
-      setBalance(response.data.balance);
+      const { data } = await api.get(`/balance/${selectedGroup}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const myBalance = data.balance[user._id] || 0;
+
+      setBalance(myBalance);
+
     } catch (error) {
-      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to fetch balance");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <>
-    <Navbar/>
-    <div className="h-143 pt-10 bg-slate-100 flex justify-center items-start">
-      <div className=" max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-        <div className="flex justify-between items-center ">
-            <h1 className="text-3xl font-bold text-green-700">Balance :</h1>
+      <Navbar />
 
-            {/* <button
-              onClick={()=>navigate("/expenseList")}
-              className="rounded-2xl py-3 text-blue-500 font-medium hover:bg-blue-50 transition "
-            >
-              Back ←
-            </button> */}
-           
-          </div>
-      <select
-       className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+      <div className="min-h-screen bg-slate-100 flex justify-center pt-10">
 
-        value={selectedGroup}
-        onChange={(e) => setSelectedGroup(e.target.value)}
-      >
-        <option value="">Select Group</option>
+        <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg p-8">
 
-        {groups.map((group) => (
-          <option
-            key={group._id}
-            value={group._id}
+          <h1 className="text-3xl font-bold text-green-700 mb-6">
+            My Balance
+          </h1>
+
+          <select
+            value={selectedGroup}
+            onChange={(e) => setSelectedGroup(e.target.value)}
+            className="w-full border rounded-xl px-4 py-3"
           >
-            {group.groupName}
-          </option>
-        ))}
-      </select>
+            <option value="">Select Group</option>
 
-      <button className="mt-2 m-2 rounded-2xl py-3 text-green-700 font-medium hover:bg-green-50 transition"
-onClick={getBalance}>
-        Show Balance 💳
-      </button>
-      
+            {groups.map((group) => (
+              <option
+                key={group._id}
+                value={group._id}
+              >
+                {group.groupName}
+              </option>
+            ))}
 
-     {Object.keys(balance).map((userId) => (
-  <div
-    key={userId}
-    className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3"
-  >
-    <h3 className="font-bold">
-      {getUserName(userId)} :
-    </h3>
+          </select>
 
-    <p
-      className={
-        balance[userId] > 0
-          ? "text-green-600"
-          : "text-red-600"
-      }
-    >
-      ${balance[userId]}
+          <button
+            onClick={fetchBalance}
+            disabled={loading}
+            className="w-full mt-5 bg-green-600 text-white rounded-xl py-3"
+          >
+            {loading ? "Loading..." : "Show Balance"}
+          </button>
+
+          <div
+            className={`mt-8 rounded-2xl p-6 text-center ${
+              balance > 0
+                ? "bg-green-100"
+                : balance < 0
+                ? "bg-red-100"
+                : "bg-gray-100"
+            }`}
+          >
+            <h2 className="text-4xl font-bold">
+              ₹ {Math.abs(balance)}
+            </h2>
+
+            <p className="mt-3 text-lg font-semibold">
+
+             {balance > 0 && (
+  <>
+    <p className="text-green-700 text-lg font-semibold">
+      Settlement Pending
     </p>
-  </div>
-))}
-    </div>
+  </>
+)}
+
+{balance < 0 && (
+  <>
+    <p className="text-red-700 text-lg font-semibold">
+      You Need To Pay
+    </p>
+
+    <button
+      className="mt-5 bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700"
+    >
+      Pay Now
+    </button>
+  </>
+)}
+
+{balance === 0 && (
+  <p className="text-green-700 text-lg font-semibold">
+    ✅ Settled
+  </p>
+)}
+
+            </p>
+
+          </div>
+
+        </div>
+
       </div>
     </>
   );

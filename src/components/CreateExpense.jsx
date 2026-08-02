@@ -1,117 +1,152 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
-import axios from "axios";
+import toast from "react-hot-toast";
+
+import api from "../api/api";
+import { getUser, getToken } from "../utils/auth";
+import { expenseSchema } from "../validation/expenseValidation";
 
 export default function CreateExpense() {
   const navigate = useNavigate();
-  const [expenseName, setExpenseName] = useState("");
+
+  const user = getUser();
+  const token = getToken();
+
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  // const [addedBy, setAddedBy] = useState("");
+
   const [groups, setGroups] = useState([]);
   const [users, setUsers] = useState([]);
+
   const [selectedGroup, setSelectedGroup] = useState(null);
-  const [selectedUser, setSelectedUser] = useState([]);
-  
-  const user = JSON.parse(localStorage.getItem("user"));
-  // console.log("login user:", user)
-  // console.log("login id:", user._id)
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
-    // eslint-disable-next-line react-hooks/immutability
     fetchUsers();
   }, []);
-  
-  async function fetchGroups() {
-    try {
-      // console.log("frontend users:", user)
-      // console.log("user id:", user._id)
-      const response = await axios.get(
-        `http://localhost:3000/billSplitter/groups/${user._id}`,
-      );
-      console.log(response.data)
-      setGroups(response.data.groups);
-      // console.log(response.data.groups);
-      
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function fetchUsers() {
-    console.log("fetch users called")
-    try {
-      // console.log("frontend users:", user)
-      // console.log("user id:", user._id)
-      const response = await axios.get(
-        'http://localhost:3000/billSplitter/users',
-      );
-     console.log("All Users From API:", response.data.users);
 
-      setUsers(response.data.users);
-      // console.log(response.data.groups);
-      
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  
-  const handleClick = async () => {
-    if (!selectedGroup) {
-      alert("Please Select a group");
-      return;
-    }
-    
-    if (selectedUser.length === 0) {
-      alert("Please select members");
-      return;
-    }
+  const fetchGroups = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/billSplitter/createExpense",
-        {
-          expenseName,
-          description,
-          groupId: selectedGroup._id,
-          amount,
-          addedBy: user._id,
-          splitBetween: selectedUser.map((user) => user.value),
+      const { data } = await api.get("/groups", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
-      console.log(response.data);
-      alert("Expense Created Successfully");
-      navigate("/expenseList");
+      });
+
+      setGroups(data.groups);
     } catch (error) {
-      console.log("something went wrong", error);
+      toast.error(error.response?.data?.message || "Failed to fetch groups");
     }
   };
 
-  function handleChange(users) {
-    setSelectedUser(users || []);
-    console.log(users);
-  }
-//  console.log("state groups:", groups)
+  const fetchUsers = async () => {
+    try {
+      const { data } = await api.get("/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUsers(data.users);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch users");
+    }
+  };
+
+  const handleCreateExpense = async (e) => {
+    e.preventDefault();
+
+    try {
+      setErrors({});
+
+      await expenseSchema.validate(
+        {
+          title,
+          description,
+          amount,
+        },
+        {
+          abortEarly: false,
+        }
+      );
+
+      if (!selectedGroup) {
+        return toast.error("Please select a group");
+      }
+
+      if (selectedUsers.length === 0) {
+        return toast.error("Please select members");
+      }
+
+      setLoading(true);
+
+      const { data } = await api.post(
+        "/expenses",
+        {
+          title,
+          description,
+          amount: Number(amount),
+          group: selectedGroup._id,
+          splitBetween: selectedUsers.map((item) => item.value),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success(data.message);
+
+      navigate("/expenseList");
+    } catch (error) {
+      if (error.inner) {
+        const validationErrors = {};
+
+        error.inner.forEach((err) => {
+          validationErrors[err.path] = err.message;
+        });
+
+        setErrors(validationErrors);
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10 ">
+    <form onSubmit={handleCreateExpense}>
+      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10">
+
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-          <h1 className="text-3xl font-bold text-blue-900">Create Expense :</h1>
+
+          <h1 className="text-3xl font-bold text-indigo-900 mb-6">
+            Create Expense
+          </h1>
+
+          <label>Select Group</label>
 
           <select
-            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
+            className="w-full mt-2 border rounded-xl px-4 py-3"
             value={selectedGroup?._id || ""}
             onChange={(e) => {
               const group = groups.find(
-                (group) => group._id === e.target.value,
+                (item) => item._id === e.target.value
               );
-             console.log("Selected Group:", group);
-  console.log("Selected User IDs:", group?.userIds);
 
               setSelectedGroup(group);
+              setSelectedUsers([]);
             }}
           >
-            <option>Select Group</option>
+            <option value="">Select Group</option>
 
             {groups.map((group) => (
               <option key={group._id} value={group._id}>
@@ -119,78 +154,95 @@ export default function CreateExpense() {
               </option>
             ))}
           </select>
-          <label className="text-sm font-medium text-slate-700">
-            Expense Name :
-          </label>
+
+          <label className="block mt-4">Expense Title</label>
 
           <input
-            value={expenseName}
-            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-            placeholder="Enter Expense Name"
-            onChange={(e) => setExpenseName(e.target.value)}
-            required
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Dinner"
+            className="w-full mt-2 border rounded-xl px-4 py-3"
           />
 
-          <label className="text-sm font-medium text-slate-700">
-            Description :
-          </label>
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.title}
+            </p>
+          )}
+
+          <label className="block mt-4">Description</label>
+
           <input
+            type="text"
             value={description}
-            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-            placeholder="Ex :Pay For Lunch"
             onChange={(e) => setDescription(e.target.value)}
-            required
+            placeholder="Dinner at restaurant"
+            className="w-full mt-2 border rounded-xl px-4 py-3"
           />
-          <label className="text-sm font-medium text-slate-700 mt-2">
-            Amount :
-          </label>
+
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description}
+            </p>
+          )}
+
+          <label className="block mt-4">Amount</label>
+
           <input
+            type="number"
             value={amount}
-            className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"
-            placeholder="$30"
             onChange={(e) => setAmount(e.target.value)}
-            required
+            placeholder="1000"
+            className="w-full mt-2 border rounded-xl px-4 py-3"
           />
-            <label className="text-sm font-medium text-slate-700 mt-2">
-              Paid By :<div  className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3  focus:border-violet-500"><b>{user.name}</b></div>
-            </label>
 
-          <label className="text-sm font-medium text-slate-700 mt-2">
-            Split Between :
+          {errors.amount && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.amount}
+            </p>
+          )}
+
+          <label className="block mt-4">Paid By</label>
+
+          <div className="w-full mt-2 border rounded-xl px-4 py-3 bg-gray-100">
+            {user.name}
+          </div>
+
+          <label className="block mt-4">
+            Split Between
           </label>
-              
-        <Select
-  className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3 focus:border-violet-500"
-  options={
-    selectedGroup
-      ? selectedGroup.userIds.map((id) => {
-          const foundUser = users.find(
-            (u) => String(u._id) === String(id)
-          );
 
-          console.log("ID:", id);
-          console.log("Found User:", foundUser);
+          <Select
+            isMulti
+            value={selectedUsers}
+            onChange={setSelectedUsers}
+            options={
+              selectedGroup
+                ? selectedGroup.members.map((id) => {
+                    const foundUser = users.find(
+                      (user) => user._id === id
+                    );
 
-          return {
-            value: id,
-            label: foundUser ? foundUser.name : "Unknown User",
-          };
-        })
-      : []
-  }
-  isMulti
-  value={selectedUser}
-  onChange={handleChange}
-/>
+                    return {
+                      value: id,
+                      label: foundUser?.name,
+                    };
+                  })
+                : []
+            }
+          />
 
           <button
-            onClick={handleClick}
-            className="mt-2 rounded-2xl py-3 text-blue-700 font-medium hover:bg-violet-50 transition"
+            type="submit"
+            disabled={loading}
+            className="w-full mt-6 bg-indigo-600 text-white rounded-xl py-3 hover:bg-indigo-700 disabled:bg-gray-400"
           >
-            + Create Expense
+            {loading ? "Creating..." : "Create Expense"}
           </button>
+
         </div>
       </div>
-    </>
+    </form>
   );
 }
