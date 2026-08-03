@@ -18,6 +18,7 @@ const user = JSON.parse(localStorage.getItem("user"));
   const [amount, setAmount] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
   }, []);
 

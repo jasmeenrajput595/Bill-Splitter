@@ -13,19 +13,22 @@ export default function CreateExpense() {
 
   const user = getUser();
   const token = getToken();
-
+  
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
 
   const [groups, setGroups] = useState([]);
   const [users, setUsers] = useState([]);
+  const [ newMembers, setNewMembers]= useState([])
+  // console.log("usersss?:", users)
 
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  // console.log("allusers:", users)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -47,7 +50,6 @@ export default function CreateExpense() {
       toast.error(error.response?.data?.message || "Failed to fetch groups");
     }
   };
-
   const fetchUsers = async () => {
     try {
       const { data } = await api.get("/users", {
@@ -57,6 +59,7 @@ export default function CreateExpense() {
       });
 
       setUsers(data.users);
+      console.log("?users:",data.users);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch users");
     }
@@ -124,6 +127,30 @@ export default function CreateExpense() {
       setLoading(false);
     }
   };
+  
+  const handleAddMembers = async ()=>{
+    console.log("selectedgroup:", selectedGroup._id)
+    console.log(newMembers)
+        try{
+            const {data} = await api.put(`/groups/ ${selectedGroup._id}/add-member`,
+            {
+               memberIds : newMembers.map((member)=>
+                  member.value) ,
+               },
+               {
+                 headers: {
+          Authorization: `Bearer ${token}`,
+        },
+               },);
+              toast.success(data.message);
+              // fetchGroups();
+              const updatedGroup = groups.find((g)=>g._id === selectedGroup._id);
+              setSelectedGroup(updatedGroup)
+              setNewMembers([]);
+            }catch(error) {
+          toast.error(error.response?.data?.message || "Failed to fetch users");
+        }
+            }
 
   return (
     <>
@@ -208,12 +235,33 @@ export default function CreateExpense() {
               {errors.amount}
             </p>
           )}
+        
+ 
+          <label className="block mt-4">
+            Add members
+          </label>
 
-          {/* <label className="block mt-4">Paid By</label>
+          <Select
+            isMulti
+            value={newMembers}
+             closeMenuOnSelect={false}
+            onChange={setNewMembers}
+          options={
+  selectedGroup
+    ? users.filter((user)=> !selectedGroup.members.some((members)=>String(members._id)===String(user._id))).map((user)=>({
+         value: user._id,
+        label: user.name,
+    }))
+    : []
+}
+          />
 
-          <div className="w-full mt-2 border rounded-xl px-4 py-3 bg-gray-100">
-            {user.name}
-          </div> */}
+           <button
+           className="text-indigo-700 hover:text-indigo-900"
+            onClick={handleAddMembers}
+          >
+            +Add more members
+          </button>
 
           <label className="block mt-4">
             Split Between
