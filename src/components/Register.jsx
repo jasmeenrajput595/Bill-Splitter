@@ -11,6 +11,8 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -111,14 +113,26 @@ export default function Register() {
 
           <label className="block mt-4">Password</label>
 
+            <div className="relative">
+
           <input
-            type="password"
+             type={showPassword ? "text" : "password"}
             placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full mt-2 rounded-xl border border-slate-300 px-4 py-3"
           />
+            
+            
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-5 text-sm text-indigo-600"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
 
+          </div>
           {errors.password && (
             <p className="text-red-500 text-sm mt-1">
               {errors.password}
