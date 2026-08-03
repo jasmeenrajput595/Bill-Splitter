@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../api/api";
 import { registerSchema } from "../validation/authValidation";
-import Navbar from "./Navbar";
+// import Navbar from "./Navbar";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -64,9 +64,9 @@ export default function Register() {
 
   return (
     <>
-     <Navbar />
+     {/* <Navbar /> */}
     <form onSubmit={handleRegister}>
-      <div className="min-h-140 bg-slate-100 flex justify-center items-start pt-10">
+      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-20">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
 
           <div className="flex justify-between items-center mb-6">
