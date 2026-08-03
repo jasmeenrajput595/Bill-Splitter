@@ -42,7 +42,7 @@ export default function Login() {
 
       toast.success(data.message);
 
-      navigate("/createGroup");
+navigate("/expenseList");
     } catch (error) {
       if (error.inner) {
         const validationErrors = {};

@@ -6,8 +6,7 @@ import { getToken, getUser } from "../utils/auth";
 
 export default function SettleUp() {
   const token = getToken();
-  const user = getUser();
-
+const user = JSON.parse(localStorage.getItem("user"));
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [settlements, setSettlements] = useState([]);
@@ -36,32 +35,28 @@ export default function SettleUp() {
     }
   };
 
-  const fetchSettlements = async () => {
-    if (!selectedGroup) {
-      return toast.error("Please select group");
-    }
+ const fetchSettlements = async () => {
+  if (!selectedGroup) {
+    return toast.error("Please select group");
+  }
 
-    try {
-      setLoading(true);
+  try {
+    const { data } = await api.get(`/settle-up/${selectedGroup}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const { data } = await api.get(
-        `/settle-up/${selectedGroup}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    console.log(data);
 
-      setSettlements(data.settlements);
+    setSettlements(data.settlements);
 
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  } catch (error) {
+    console.log(error);
+    console.log(error.response);
+    toast.error(error.response?.data?.message || "Error");
+  }
+};
   const openModal = (item) => {
     setSelectedSettlement(item);
     setAmount(item.amount);
@@ -100,6 +95,8 @@ export default function SettleUp() {
       toast.error(error.response?.data?.message);
     }
   }
+  console.log("Logged User:", user);
+console.log("Settlements:", settlements);
 
     return (
     <>
@@ -175,23 +172,20 @@ export default function SettleUp() {
                     ₹ {item.amount}
                   </p>
 
-                  {item.from._id === user._id ? (
+                {String(item.from._id) === String(user?._id) && (
+  <button
+    onClick={() => openModal(item)}
+    className="mt-4 bg-red-600 text-white px-5 py-2 rounded-xl hover:bg-red-700"
+  >
+    Pay Now
+  </button>
+)}
 
-                    <button
-                      onClick={() => openModal(item)}
-                      className="mt-4 bg-red-600 text-white px-5 py-2 rounded-xl hover:bg-red-700"
-                    >
-                      Pay Now
-                    </button>
-
-                  ) : item.to._id === user._id ? (
-
-                    <span className="inline-block mt-4 bg-green-100 text-green-700 px-4 py-2 rounded-xl font-semibold">
-                      Settlement Pending
-                    </span>
-
-                  ) : null}
-
+{String(item.to._id) === String(user?._id) && (
+  <span className="inline-block mt-4 bg-green-100 text-green-700 px-4 py-2 rounded-xl font-semibold">
+    Settlement Pending
+  </span>
+)}
                 </div>
 
               ))}

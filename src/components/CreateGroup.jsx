@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import toast from "react-hot-toast";
+import Navbar from "./Navbar";
+
 
 import api from "../api/api";
 import { groupSchema } from "../validation/groupValidation";
@@ -101,8 +103,10 @@ export default function CreateGroup() {
   };
 
   return (
+    <>
+    <Navbar/>
     <form onSubmit={handleCreateGroup}>
-      <div className="min-h-screen bg-slate-100 flex flex-col items-center pt-10">
+      <div className="min-h-164 bg-slate-100 flex flex-col items-center pt-10">
 
         <h1 className="text-3xl font-bold text-indigo-800 mb-6">
           Welcome, {user.name}
@@ -154,6 +158,7 @@ export default function CreateGroup() {
         </div>
       </div>
     </form>
+    </>
   );
 }
 

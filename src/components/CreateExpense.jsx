@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import toast from "react-hot-toast";
+import Navbar from "./Navbar";
 
 import api from "../api/api";
 import { getUser, getToken } from "../utils/auth";
@@ -123,10 +124,12 @@ export default function CreateExpense() {
   };
 
   return (
+    <>
+     <Navbar />
     <form onSubmit={handleCreateExpense}>
-      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-10">
+      <div className="min-h-98 bg-slate-100 flex justify-center items-start pt-5">
 
-        <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
+        <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-4">
 
           <h1 className="text-3xl font-bold text-indigo-900 mb-6">
             Create Expense
@@ -203,11 +206,11 @@ export default function CreateExpense() {
             </p>
           )}
 
-          <label className="block mt-4">Paid By</label>
+          {/* <label className="block mt-4">Paid By</label>
 
           <div className="w-full mt-2 border rounded-xl px-4 py-3 bg-gray-100">
             {user.name}
-          </div>
+          </div> */}
 
           <label className="block mt-4">
             Split Between
@@ -217,20 +220,14 @@ export default function CreateExpense() {
             isMulti
             value={selectedUsers}
             onChange={setSelectedUsers}
-            options={
-              selectedGroup
-                ? selectedGroup.members.map((id) => {
-                    const foundUser = users.find(
-                      (user) => user._id === id
-                    );
-
-                    return {
-                      value: id,
-                      label: foundUser?.name,
-                    };
-                  })
-                : []
-            }
+          options={
+  selectedGroup
+    ? selectedGroup.members.map((member) => ({
+        value: member._id,
+        label: member.name,
+      }))
+    : []
+}
           />
 
           <button
@@ -244,5 +241,6 @@ export default function CreateExpense() {
         </div>
       </div>
     </form>
+    </>
   );
 }
