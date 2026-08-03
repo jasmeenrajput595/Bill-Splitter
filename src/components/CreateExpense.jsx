@@ -28,7 +28,9 @@ export default function CreateExpense() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
+    // eslint-disable-next-line react-hooks/immutability
     fetchUsers();
   }, []);
 
@@ -140,6 +142,7 @@ export default function CreateExpense() {
           <select
             className="w-full mt-2 border rounded-xl px-4 py-3"
             value={selectedGroup?._id || ""}
+             closeMenuOnSelect={false}
             onChange={(e) => {
               const group = groups.find(
                 (item) => item._id === e.target.value
@@ -219,6 +222,7 @@ export default function CreateExpense() {
           <Select
             isMulti
             value={selectedUsers}
+             closeMenuOnSelect={false}
             onChange={setSelectedUsers}
           options={
   selectedGroup

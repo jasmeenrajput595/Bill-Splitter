@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../api/api";
 import { loginSchema } from "../validation/authValidation";
+import Navbar from "./Navbar";
+
 
 export default function Login() {
   const navigate = useNavigate();
@@ -61,8 +63,11 @@ navigate("/expenseList");
   };
 
   return (
+    <>
+    <Navbar />
+  
     <form onSubmit={handleLogin}>
-      <div className="min-h-screen bg-slate-100 flex justify-center items-start pt-30">
+      <div className="min-h-140 bg-slate-100 flex justify-center items-start pt-30">
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
 
           <div className="flex justify-between items-center mb-6">
@@ -134,5 +139,6 @@ navigate("/expenseList");
         </div>
       </div>
     </form>
+    </>
   );
 }

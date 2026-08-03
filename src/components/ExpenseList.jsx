@@ -16,6 +16,7 @@ export default function ExpenseList() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     fetchGroups();
   }, []);
 
@@ -59,7 +60,7 @@ export default function ExpenseList() {
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-slate-100 flex justify-center pt-10">
+      <div className="min-h-140 bg-slate-100 flex justify-center pt-10">
 
         <div className="w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8">
 
@@ -71,6 +72,7 @@ export default function ExpenseList() {
 
             <select
               value={selectedGroup}
+               closeMenuOnSelect={false}
               onChange={(e) => setSelectedGroup(e.target.value)}
               className="flex-1 border rounded-xl px-4 py-3"
             >

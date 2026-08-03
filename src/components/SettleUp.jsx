@@ -114,6 +114,7 @@ console.log("Settlements:", settlements);
 
             <select
               value={selectedGroup}
+               closeMenuOnSelect={false}
               onChange={(e) => setSelectedGroup(e.target.value)}
               className="flex-1 border rounded-xl px-4 py-3"
             >

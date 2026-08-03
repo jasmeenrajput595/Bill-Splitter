@@ -141,6 +141,7 @@ export default function CreateGroup() {
           <Select
             isMulti
             options={userList}
+            closeMenuOnSelect={false}
             value={selectedUsers}
             onChange={setSelectedUsers}
             placeholder="Select Members"
